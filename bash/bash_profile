@@ -1,0 +1,15 @@
+# $DOTFILES/bash/profile
+#
+# Entry point for login bash shells. This should be sourced by
+# $HOME/.bash_profile. (or .bash_login, I guess...)
+#
+if [[ -z $DOTFILES ]]; then
+	printf "\nFAIL! \$DOTFILES variable is not set.\n"
+	return 1
+fi
+
+source "$DOTFILES/bash/startup-helpers.bash"
+source_files_in_dir "$DOTFILES/bash/profile.d"
+
+# Pick up aliases and other stuff, too.
+source "$DOTFILES/bash/bashrc"

@@ -1,0 +1,18 @@
+# $DOTFILES/bash/bashrc
+#
+# Entry point for non-login bash shells. This should be sourced by
+# $HOME/.bashrc.
+
+# If not running interactively, don't do anything
+case $- in
+	*i*) : interactive, carry on ;;
+	*) return ;;
+esac
+
+if [[ -z $DOTFILES ]]; then
+	printf "FAIL! \$DOTFILES variable is not set.\n"
+	return 1
+fi
+
+source "$DOTFILES/bash/startup-helpers.bash"
+source_files_in_dir "$DOTFILES/bash/bashrc.d"
