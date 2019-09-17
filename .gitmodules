@@ -1,0 +1,16 @@
+[submodule "editorconfig-vim"]
+	path = vim/pack/aghast/start/editorconfig-vim
+	url = https://github.com/editorconfig/editorconfig-vim.git
+[submodule "tpope/surround"]
+	path = vim/pack/tpope/start/surround
+	url = https://tpope.io/vim/surround.git
+
+[submodule "LucHermitte/lh-vim-lib"]
+	path = vim/pack/LucHermitte/start/lh-vim-lib
+	url = https://github.com/LucHermitte/lh-vim-lib
+
+[submodule "LucHermitte/local_vimrc"]
+	path = vim/pack/LucHermitte/start/local_vimrc
+	url = https://github.com/LucHermitte/local_vimrc
+
+

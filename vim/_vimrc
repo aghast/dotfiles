@@ -1,0 +1,27 @@
+" If we have symbolic links, then ~/.vimrc should be a symlink to 
+" $DOTFILES/vim/vimrc, and ~/.vim should be a symlink to $DOTFILES/vim
+" Otherwise, with no symlinks this file (either _vimrc or .vimrc) needs to 
+" redirect the processing of .vimrc (by sourcing the "real" file) and needs
+" to redirect the location of the ~/.vim directory (by modifying runtimepath)
+"
+set runtimepath-=~/.vim
+set runtimepath-=~/.vim/after
+
+if has("win32") || has("win32unix")
+    " No symbolic links, so redirect ~/.vim to DOTFILES/vim instead
+
+    if empty($DOTFILES)
+	    let g:aghast_dot_vim_dir = '~/Code/' . $USER . '/dotfiles/vim'
+    else
+	    let g:aghast_dot_vim_dir = $DOTFILES . '/vim'
+    endif
+
+else
+    let g:aghast_dot_vim_dir = '~/.vim'
+endif
+
+let g:aghast_dot_vim_after_dir = g:aghast_dot_vim_dir . '/after'
+
+let &runtimepath = g:aghast_dot_vim_dir 
+    \ . (empty(&runtimepath) ? "" : ",") . &runtimepath
+    \ . "," . g:aghast_dot_vim_after_dir
