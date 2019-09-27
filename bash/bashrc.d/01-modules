@@ -1,6 +1,0 @@
-# $DOTFILES/bashrc.d/01-modules
-# Initialize variables for environment-modules system
-
-export MODULESHOME="${MODULESHOME:-/usr/share/modules}"
-source $MODULESHOME/init/bash
-

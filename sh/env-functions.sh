@@ -1,22 +1,35 @@
-# $DOTFILES/bash/profile.d/01-path-functions
+# $DOTFILES/sh/env-functions.sh
 #
 # Functions for manipulating PATH & similar variables.
 
 # This should never happen. Seriously.
-if [[ -z $PATH ]]
+if [ "X$PATH" = "X" ]
 then 
-	printf "\n\nPATH was empty in profile.d, WTF?!?!?!\n\n" >&2
-	PATH=/usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games
-	export PATH
+	printf "\n\nPATH was empty in " >&2
+	PATH=/usr/local/bin:/usr/bin:/bin:/path-was-empty-in-envfunctions
 fi
 
 # Check for test mode.
-if [[ $1 == -t || $1 == --test ]]
+if [ "$1" = "-t" -o "$1" = "--test" ]
 then
 	_path_run_tests=true	# Set to true to run self-tests
 fi
 
-:<<=cut
+try_source() {
+	if [ $# -ne 1 ]
+	then
+		cat >&2 <<-USAGE
+Usage: try_source FILE
+
+		USAGE
+		return 1
+	fi
+
+	local srcfile="$1"
+	. "$srcfile"
+}
+
+:<<='cut'
 
 =item B<path_add> [ --after [DIR] | --before [DIR] ] ITEM PATH
 
@@ -45,14 +58,14 @@ path_add() {
 	local position="--after"
 	local target
 
-	while [[ "$#" -gt 2 ]]
+	while [ $# -gt 2 ]
 	do
 		case "$1" in 
 		--after|--before)
 			position="$1"
 			shift
 
-			if [[ "$#" -gt 2 && "$1" != -- ]]
+			if [ "$#" -gt 2 -a "$1" != -- ]
 			then
 				target="$1" 
 				shift 
@@ -63,9 +76,9 @@ path_add() {
 		esac
 	done
 	
-	if [[ "$#" -ne 2 ]]
+	if [ "$#" -ne 2 ]
 	then
-		if [[ "$#" -lt 2 ]]
+		if [ "$#" -lt 2 ]
 		then
 			_path_error 'You must provide both DIR and $PATHVAR'
 		else
@@ -83,16 +96,16 @@ Usage: PATHVAR=$(path_add [ { --before | --after } [DIR] ] "DIR" "$PATHVAR")
 	local item="$1"
 	local path="$2"
 
-	[[ "$item" =~ .*[[:cntrl:]].* ]] \
+	expr "$item" : ".*[[:cntrl:]]" >/dev/null \
 		&& _path_warning "Control characters in ${item@A}"
-	[[ "$path" =~ .*[[:cntrl:]].* ]] \
+	expr "$path" : ".*[[:cntrl:]]" >/dev/null \
 		&& _path_warning "Control characters in '${path@A}"
 
-	if [[ -n "$target" && :"$path": == *:"$target":* ]]
+	if [ -n "$target" ] && expr ":${path}:" :  ".*:$target:" >/dev/null
 	then
 		path=:"$path":
 
-		if [[ "$position" == --after ]]
+		if [ "$position" = --after ]
 		then
 			local t_start="${path%:"$target":*}:$target"
 			local t_end="${path##*:"$target":}"
@@ -105,7 +118,7 @@ Usage: PATHVAR=$(path_add [ { --before | --after } [DIR] ] "DIR" "$PATHVAR")
 	else
 		# Target wasn't specified, or is missing from path
 
-		if [[ "$position" == --after ]]
+		if [ "$position" = --after ]
 		then
 			path="$path:$item"
 		else
@@ -120,7 +133,7 @@ Usage: PATHVAR=$(path_add [ { --before | --after } [DIR] ] "DIR" "$PATHVAR")
 path_delete() {
 	local target="$1"
 	local path=":$2:"
-	path="${path//:$"target"}"
+	path="${path//:$target}"
 	path="${path#:}"
 	path="${path%:}"
 	printf "%s\n" "${path}"
@@ -133,7 +146,7 @@ _test_path_add() {
 	local varvar="$*"
 	local but_var
 
-	if [[ -n $varvar ]]
+	if [ -n $varvar ]
 	then
 		but_var=" but $varvar"
 	fi
@@ -277,7 +290,7 @@ _path_maybe_run_tests() {
 		return 0
 	fi
 
-	source tap.sh --no-prefix || {
+	. tap.sh --no-prefix || {
 		_path_error "Unable to load tap.sh testing functions"
 		return 1
 	}

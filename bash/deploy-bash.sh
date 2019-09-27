@@ -1,93 +1,103 @@
-# NOTE: The `local` keyword is not part of the POSIX standard. But all the
-# shells I've used in the past 10 years or so have supported it, so I'm going
-# to leave it in. You can simply delete the keyword if you ever have a problem
-# with it. (Or stop running in strict-POSIX mode, you git!)
+#!/usr/bin/env bash
+#
+# $DOTFILES/bash/deploy-bash.sh
+#
+# Script to "deploy" bash dotfiles to the current user's home directory.
+# For linux, this creates symbolic links. For windows, it copies trampoline
+# files.
+#
 
-if [ -z "$DOTFILES" ]
-then
-	printf "ERROR: The DOTFILES environment variable is not set.\n" >&2
-	printf "Set this variable to the path to the dotfiles project.\n\n" >&2
-	exit 1
-fi
+dotfiles() {
+	#
+	# Set the DOTFILES variable, if it isn't already.
+	#
+	if [[ -z $DOTFILES ]]
+	then
+		local thisfile="${BASH_SOURCE[0]}"
+		local thisdir="$(dirname "$thisfile")"
+		local bashrc="${thisdir}/../bash/bashrc"
+		
+		if [[ -f $bashrc && -r $bashrc ]]
+		then
+			DOTFILES="$thisdir"
+		fi
+	fi
 
-# This is mainly "deploy with symbolic links".
+	if [[ -z $DOTFILES && -f "bash/bashrc" && -r "bash/bashrc" ]]
+	then
+		DOTFILES="$PWD"
+	fi
+
+	if [[ -z $DOTFILES ]]
+	then
+		printf "\nERROR: Unable to determine DOTFILES directory.\n" >&2
+		printf "Set it by hand, or cd to the root of the dotfiles repo.\n" >&2
+		exit 1
+	fi
+}
+
 deploy_linux() {
+	# 
+	# This is mainly "deploy with symbolic links".
+	#
 	local source="$DOTFILES/bash"
 	local target="$HOME"
 
 	ln -s "$source/bashrc" "$target/.bashrc" 
-	ln -s "$source/bashrc.d" "$target/.bashrc.d" 
-
+	ln -s "$source/bash_logout" "$target/.bash_logout" 
 	ln -s "$source/bash_profile" "$target/.bash_profile" 
-	ln -s "$source/bash_profile.d" "$target/.bash_profile.d" 
 }
 
-make_stub() {
-	local source="$1"
-	local target="$2"
-
-	source="$(echo "$source" \
-		| sed -e "s,$DOTFILES,\${DOTFILES:-$DOTFILES}," -e 's,/./,/,g')"
-	cat > "$target" <<-EOF
-		# stub file in lieu of symbolic links
-		. "$source"
-	EOF
-}
-
-copy_files_as_stubs() {
-	local source="$1"
-	local target="$2"
-
-	(
-		cd "$source";
-		find . \( ! -regex '\.' \) -type d \
-			-exec mkdir "$target"/{} \;
-		find . -type f \
-		| while read scriptpath 
-		  do
-			  make_stub "$source/$scriptpath" "$target/$scriptpath" 
-		  done
-	)
-}
-
-# This is mainly "deploy with no symbolic links".
 deploy_windows() {
-	local source="$DOTFILES/bash"
-	local target="$HOME"
+	#
+	# This is mainly "deploy with no symbolic links".
+	#
+	local source_dir="$DOTFILES/bash"
+	local target_dir="$HOME"
 
-	make_stub "$source/bashrc" "$target/_bashrc"
-	mkdir -p "$target/_bashrc.d"
-	copy_files_as_stubs "$source/bashrc.d" "$target/_bashrc.d"
+	for file in _bashrc _bash_logout _bash_profile
+	do
+		local source="$source_dir/$file"
+		local target="$target_dir/$file"
 
-	make_stub "$source/bash_profile" "$target/_bash_profile"
-	mkdir -p "$target/_bash_profile.d"
-	copy_files_as_stubs "$source/bash_profile.d" "$target/_bash_profile.d"
+		if [ -e "$target" ] 
+		then
+			printf "WARNING: '$target' already exists. Skipped." \
+				>&2
+		else
+			sed -e "s/@DOTFILES@/$DOTFILES/g"	\
+			< "$source" 				\
+		       	> "$target"
+		fi
+	done
 }
 
-case "$(uname -s)" in
-Linux|*BSD)
-	deploy_linux
-	;;
-CYGWIN_NT*)  # cygwin
-	deploy_windows
-	;;
-Interix)     # Windows Services for Unix
-	deploy_windows
-	;;
-Windows_NT)  # busybox-w32
-	deploy_windows
-	;;
-MS-DOS)      # djgpp
-	printf "ERROR: Don't know how to deploy to MS-DOS (yet)!\n\n" >&2
-	false
-	;;
-GNU*)        # Debian GNU/HURD
-	printf "ERROR: Don't know how to deploy on HURD (yet)!\n\n" >&2
-	false
-	;;
-*)
-	printf "ERROR: Don't know how to deploy on $(uname -s) (yet)!\n\n" >&2
-	false
-	;;
-esac
+deploy_by_uname() {
+	case "$(uname -s)" in
+	*BSD)		deploy_linux	;; # FreeBSD or NetBSD (or ...?)
+	Linux)		deploy_linux	;; # Linux
+	CYGWIN_NT*)	deploy_windows	;; # cygwin
+	Interix)	deploy_windows	;; # Windows Services for Unix
+	Windows_NT)	deploy_windows	;; # busybox-w32
+	MS-DOS)				   # djgpp
+		printf "ERROR: Don't know how to deploy to MS-DOS!\n" >&2
+		false
+		;;  
+	GNU*)				   # Debian GNU/HURD
+		printf "ERROR: Don't know how to deploy on HURD!\n\n" >&2
+		false
+		;;
+	*)				   # "other"
+		printf "ERROR: Don't know how to deploy on $(uname -s)!\n" >&2
+		false
+		;;
+	esac
+}
+
+main() {
+	dotfiles
+	deploy_by_uname
+}
+
+main "$@"
 

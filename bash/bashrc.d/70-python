@@ -1,7 +1,0 @@
-# Use this format to register Bash argument completion for individual 
-# applications
-
-for APPNAME in pipx 
-do
-	eval "$(register-python-argcomplete $APPNAME)"
-done

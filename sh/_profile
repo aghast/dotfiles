@@ -1,0 +1,6 @@
+# $DOTFILES/sh/_profile
+#
+# Trampoline to be copied into $HOME for systems that lack symbolic links.
+#
+source "${DOTFILES:-@DOTFILES@}/sh/profile"
+

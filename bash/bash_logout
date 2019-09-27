@@ -1,6 +1,6 @@
-# $DOTFILES/bash/bash_profile
+# $DOTFILES/bash/bash_logout
 #
-# Entry point for login bash shells.
+# Entry point for bash logout processing (interactive shells).
 #
 # 1. Inherit, read, or assign the DOTFILES variable -- there's no good way
 #    to compute it. Regardless, the value is exported since it shouldn't 
@@ -27,22 +27,4 @@ export DOTFILES
 SHRC_SHELL_FLAVOR="${SHRC_SHELL_FLAVOR:-bash}"
 SHRC_SCRIPT_DIR="${SHRC_SCRIPT_DIR:-${DOTFILES}/${SHRC_SHELL_FLAVOR}}"
 
-# 
-# 3. Run the environment-setup script (env) as the foundation of all other
-#    configuration. Note: this file eventually includes the definition of
-#    'try_source'. It cannot be used until this path executes.
-#
-source "$SHRC_SCRIPT_DIR/env.sh"
-
-#
-# 4. Run the login script for this shell type.
-#
-try_source "$SHRC_SCRIPT_DIR/login.sh"
-
-#
-# 5. Run the interactive script for this shell, if appropriate.
-#
-if [[ $PS1 ]]
-then
-	try_source "$SHRC_SCRIPT_DIR/interactive.sh"
-fi
+source "${SHRC_SCRIPT_DIR}/logout.sh"

@@ -1,18 +1,44 @@
 # $DOTFILES/bash/bashrc
 #
-# Entry point for non-login bash shells. This should be sourced by
-# $HOME/.bashrc.
-
-# If not running interactively, don't do anything
-case $- in
-	*i*) : interactive, carry on ;;
-	*) return ;;
-esac
-
-if [[ -z $DOTFILES ]]; then
-	printf "FAIL! \$DOTFILES variable is not set.\n"
-	return 1
+# Entry point for non-login bash shells.
+#
+# 1. Inherit, read, or assign the DOTFILES variable -- there's no good way
+#    to compute it. Regardless, the value is exported since it shouldn't 
+#    change for subshells.
+#
+if [[ ! $DOTFILES ]]
+then
+	if [[ -f $HOME/.dotfiles && -r $HOME/.dotfiles && -s $HOME/.dotfiles ]]
+	then
+		DOTFILES="$(head -n 1 "$HOME/.dotfiles")"
+	else
+		DOTFILES="$HOME/dotfiles"
+	fi
 fi
 
-source "$DOTFILES/bash/startup-helpers.bash"
-source_files_in_dir "$DOTFILES/bash/bashrc.d"
+export DOTFILES
+
+#
+# 2. Set the shell type (bash) and the login status (login) here, since
+#    this information is determined by the fact of reading this file.
+#    Don't export SESSION variables, since a subshell might have different
+#    parameters. (Won't be a login shell, might not be bash, etc.)
+#
+SHRC_SHELL_FLAVOR="${SHRC_SHELL_FLAVOR:-bash}"
+SHRC_SHELL_LOGIN="${SHRC_SHELL_LOGIN:-nonlogin}"
+SHRC_SCRIPT_DIR="${SHRC_SCRIPT_DIR:-${DOTFILES}/${SHRC_SHELL_FLAVOR}}"
+
+# 
+# 3. Run the environment-setup script (env) as the foundation of all other
+#    configuration. Note: this file eventually includes the definition of
+#    'try_source'. It cannot be used until this path executes.
+#
+source "$SHRC_SCRIPT_DIR/env.sh"
+
+#
+# 4. Run the interactive script for this shell, if appropriate.
+#
+if [[ $PS1 ]]
+then
+	try_source "$SHRC_SCRIPT_DIR/interactive.sh"
+fi

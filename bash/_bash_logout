@@ -1,0 +1,5 @@
+# $DOTFILES/bash/_bash_logout
+#
+# Trampoline to be copied into $HOME for systems that lack symbolic links.
+#
+source "${DOTFILES:-@DOTFILES@}/bash/_bash_logout"

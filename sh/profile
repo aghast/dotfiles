@@ -1,0 +1,2 @@
+echo "Unexpected SHKIND = sh in .profile" >&2
+
