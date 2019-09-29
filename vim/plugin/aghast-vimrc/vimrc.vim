@@ -21,3 +21,14 @@ execute "nnoremap <Leader>ev	:split " . g:aghast_dot_vim_dir . "/plugin/aghast-v
 " ,sv sources my "real" vimrc file
 execute "nnoremap <Leader>sv  :source " . g:aghast_dot_vim_dir . "/plugin/aghast-vimrc/vimrc.vim<CR>"
 
+" ,ed starts opening a file in $DOTFILES
+execute "nnoremap <Leader>ed    :split $DOTFILES/<TAB>"
+
+" Configuration settings for installed plugins {{{
+
+" LucHermitte/local_vimrc {{{
+let g:local_vimrc = [ 'etc', 'vimrc_local.vim']
+" }}}
+
+" }}}
+"
