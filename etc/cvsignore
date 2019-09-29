@@ -1,0 +1,16 @@
+# User-specific ignore file. Used by CVS, rsync, git, hg, etc.
+# To use with git:   
+# 	git config --global core.excludesfile "$DOTFILES/etc/cvsignore"
+#
+# To use with hg, add to .hgrc:
+#       [ui]
+#       ignore.user = %USERPROFILE%\dotfiles\etc\cvsignore
+
+# 'tags' file is generated locally by ctags/etags, used by vi. Since it's 
+# "compiled" from the local source code, there's no reason to check it in.
+tags
+TAGS
+
+# *.swp files are vi/vim editor swapfiles, created while editing a file in the
+# same directory.
+.*.swp

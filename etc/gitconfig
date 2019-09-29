@@ -1,0 +1,11 @@
+[user]
+	email = ah08010-github@yahoo.com
+	name = aghast
+[core]
+	editor = vim
+	excludesfile = ~/.cvsignore
+[alias]
+	st = status
+	co = checkout
+	br = branch
+	ci = commit
