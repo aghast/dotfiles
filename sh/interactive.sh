@@ -101,9 +101,25 @@ less_pager_settings() {
 less_pager_settings
 # }}}
 
+#
+# Pyenv python-version management tool {{{
+#
+
+eval "$(pyenv init -)"
+eval "$(pyenv virtualenv-init -)"
+
+# }}}
+
 # 
 # USER VARIABLES {{{
 #
 export CODE="${HOME}/Code/aghast"
 
+df() {
+	cd "${DOTFILES}/${*:-}"
+}
+
+wo() {
+	cd "${CODE}/${*:-}"
+}
 # }}}

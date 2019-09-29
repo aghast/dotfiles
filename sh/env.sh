@@ -58,7 +58,4 @@ fi
 #
 PATH="$(path_add --before "${HOME}/.pyenv/bin" "$PATH")"
 
-eval "$(pyenv init -)"
-eval "$(pyenv virtualenv-init -)"
-
 # }}}

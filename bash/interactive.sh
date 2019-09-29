@@ -1,4 +1,5 @@
 # $DOTFILES/bash/interactive.sh
+# vim: set fdm=marker:
 #
 # Called for all interactive bash shells.
 #
@@ -87,5 +88,11 @@ done
 #    (in $PROJECT_ROOT/.envrc, and children)
 #
 eval "$(direnv hook bash)"
+
+# }}}
+
+#
+# USER SETTINGS {{{
+#
 
 # }}}
