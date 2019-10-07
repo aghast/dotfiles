@@ -14,7 +14,11 @@ try_source "$SHRC_SCRIPT_DIR/../sh/interactive.sh"
 # Bash infers the length of the prompt from PS1 without \[ and \] as being
 # longer, and therefore interferes with how readline handles line editing.
 fixup_prompt() {
-	local prompt="$(printf "${PS1}x" | sed -e 's/\('$'\e''\[[0-9;]*m\)/\\[\1\\]/g')"
+	local prompt="$(printf "${PS1}x" \
+		| sed -e 's/\('$'\e''\[[0-9;]*m\)/\\[\1\\]/g' \
+		      -e 's/\${PWD}/\\w/g' \
+		      -e 's/\${HOSTNAME}/\\h/g' -e 's/\${USER}/\\u/g' \
+		      -e 's/\$ /\\$ /')"
 	PS1="${prompt%?}"	# %? strips off trailing 'x' from printf
 }
 

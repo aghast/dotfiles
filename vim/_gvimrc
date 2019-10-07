@@ -1,0 +1,3 @@
+" $DOTFILES/vim/_gvimrc
+"
+echom "_gvimrc: term=".&term

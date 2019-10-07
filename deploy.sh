@@ -1,5 +1,8 @@
 #!/bin/sh
 
+ETC_PATH=${ETC_PATH:-$(dirname "$(readlink -f "$0")")}
+
+# FIXME: Switch this to computing dotfiles from etc_path, above.
 if [ -z "$DOTFILES" ]
 then
 	printf "ERROR: The DOTFILES environment variable is not set!\n" >&2
@@ -7,11 +10,9 @@ then
 	exit 1
 fi
 
-ETC_PATH=${ETC_PATH:-$(dirname "$(readlink -f "$0")")}
-
 get_shellname() {
 	shell="${1:-$(getent passwd "$LOGNAME" | cut -d: -f7)}"
-	whatshell=$("$shell" "$DOTFILES/etc/whatshell.sh")
+	whatshell=$("$shell" "${ETC_PATH}/whatshell.sh")
 	set -- $whatshell
 
 	whatshell="$1"
@@ -23,7 +24,7 @@ get_shellname() {
 	printf "$whatshell"
 }
 
-deploy() {
+deploy_shell() {
 	local shellname=""	# Not POSIX. Comment it out if you need to.
 	local deploy_script=""
 
@@ -38,4 +39,6 @@ deploy() {
 	fi
 }
 
-deploy $1
+deploy_shell $1
+
+# FIXME: Get around to creating the ~/.dotfiles link

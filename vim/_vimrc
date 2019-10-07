@@ -4,9 +4,7 @@
 " redirect the processing of .vimrc (by sourcing the "real" file) and needs
 " to redirect the location of the ~/.vim directory (by modifying runtimepath)
 "
-set runtimepath-=~/.vim
-set runtimepath-=~/.vim/after
-
+echom "vimrc shellpipe=".&shellpipe
 if has("win32") || has("win32unix")
     " No symbolic links, so redirect ~/.vim to DOTFILES/vim instead
 
@@ -22,6 +20,48 @@ endif
 
 let g:aghast_dot_vim_after_dir = g:aghast_dot_vim_dir . '/after'
 
+" Remove possibly-bad values from rtp.
+set runtimepath-=~/.vim
+set runtimepath-=~/.vim/after
+
+" Install computed-good values
 let &runtimepath = g:aghast_dot_vim_dir 
     \ . (empty(&runtimepath) ? "" : ",") . &runtimepath
     \ . "," . g:aghast_dot_vim_after_dir
+
+" This file is processed during section "3." of the Vim startup process.
+" (See ":help startup" for the documentation.) For Unix systems, where
+" symbolic links are available, the best approach is to create a symlink from
+" $HOME/.vimrc pointing to $DOTFILES/vim/_vimrc. The deploy.sh script should
+" do this. 
+"
+" For Windows, you can copy this file into $HOME, or set the $VIM directory
+" to point to $DOTFILES/vim. Either should work. (The deploy.sh script will
+" make the copy.)
+"
+" The $VIMINIT variable can override this (see "3.c.I") if necessary. For
+" example, if the $HOME location is readonly and cannot be modified (on Unix;
+" Windows users can just set $VIM).
+"
+if ! has('eval')
+    " This should never happen.
+    echoerr "The 'eval' feature is missing, so dotfiles will not be loaded."
+endif
+"
+" Once the end of this file is processed (this point), the startup process
+" enters step "4." -- "load-plugins". (See ":help load-plugins".) The plugin
+" load process is similar in effect to the command:
+"       :runtime! plugin/**/*.vim
+" which obviously depends on setting the &runtimepath (as I have done above).
+"
+" This file, then, just sets some minimal enviroment and global variables
+" to reflect the environment, and configures the &runtimepath to include the
+" $DOTFILES locations where vim startup configuration is stored. This file is 
+" no more than a "trampoline" that lets vim bounce from the home directory to
+" the version-controlled dotfiles repository.
+"
+" IMPORTANT: Vim loads 'plugins' before loading 'packages.' This means that 
+" files under $DOTFILES/vim/plugin will be run before files under
+" $DOTFILES/vim/pack. For this reason, my "aghast-vimrc" directory is below
+" vim/plugin.
+
