@@ -1,0 +1,28 @@
+# EditorConfig is awesome: https://EditorConfig.org
+
+# top-most EditorConfig file
+root = true
+
+# All files get this
+[*]
+# Unix-style line endings
+end_of_line = lf
+# Put a newline at the end of every file
+insert_final_newline = true
+
+# Set default charset
+[*.{js,py}]
+charset = utf-8
+
+[*.py]
+indent_style = space
+indent_size = 4
+
+# Tab indentation (no size specified)
+[{GNUMakefile,Makefile,*.make,*.bash,*.sh}]
+indent_style = tab
+
+# Matches the exact files either package.json or .travis.yml
+[{package.json,.travis.yml}]
+indent_style = space
+indent_size = 4

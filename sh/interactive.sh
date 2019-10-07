@@ -1,5 +1,5 @@
 #
-# CHROOT IN PROMPT (DEBIAN)
+# CHROOT IN PROMPT (DEBIAN) {{{
 #
 
 add_chroot_to_prompt() {
@@ -14,8 +14,10 @@ add_chroot_to_prompt() {
 
 add_chroot_to_prompt
 
+# }}}
+
 #
-# COLOR(s)
+# COLOR(s) {{{
 #
 set_color_prompt() {
 	local color_prompt=false
@@ -74,8 +76,29 @@ add_color_support() {
 
 add_color_support
 
+# }}}
+
 #
-# WINDOW TITLES
+# PATH FUNCTIONS {{{
+#
+path() {
+	local pathvar="${1:-PATH}"
+	printf "Directories in $pathvar:\n"
+
+	local pathitems
+	eval "pathitems=\"\$${pathvar}\""
+
+	printf "${pathitems}x\n" \
+	| tr ':' "\n" \
+	| sed -e '$d' \
+	| nl -n rz -s ": " -w2
+}
+
+
+# }}}
+
+#
+# WINDOW TITLES {{{
 #
 
 set_window_title() {
@@ -87,6 +110,8 @@ set_window_title() {
 }
 
 set_window_title
+
+# }}}
 
 #
 # LESS PAGER SETTINGS {{{
@@ -105,8 +130,15 @@ less_pager_settings
 # Pyenv python-version management tool {{{
 #
 
-eval "$(pyenv init -)"
-eval "$(pyenv virtualenv-init -)"
+case "$PATH" in
+*:"$HOME"/.pyenv/shims:* ) 
+	: do nothing 
+	;;
+* ) 
+	eval "$(pyenv init -)" 
+	eval "$(pyenv virtualenv-init -)"
+	;;
+esac
 
 # }}}
 
@@ -120,6 +152,47 @@ df() {
 }
 
 wo() {
-	cd "${CODE}/${*:-}"
+	# Just fail.
+	[ $# -eq 0 ] && return 1
+
+	local target="${CODE}/${*}"
+
+	if [ -d "$target" ]
+	then
+		cd "$target"
+		return
+	fi
+
+	# Abbreviation. Try to figure out if there's a valid longer match.
+	case "$target" in
+	*-* )	endword="${*#*-}" ;;
+	* )	endword="${*}" ;;
+	esac
+
+	n_matches=0
+	for cand in "${CODE}"/*-"$endword"
+	do
+		if [ -d "$cand" ]
+		then
+			n_matches=$(($n_matches + 1))
+			target="$cand"
+		fi
+	done
+
+	case "$n_matches" in
+	0 ) 	printf "No such directory '$target' in %s" \
+			"CODE, and nothing similar\n"
+		return 1
+		;;
+	1 )	cd "$target"
+		;;
+	* )	printf "Multiple candidates found:\n"
+		for cand in "${CODE}"/*-"$endword"
+		do
+			printf "  *  %s\n" "$cand"
+		done
+		return 0
+		;;
+	esac
 }
 # }}}

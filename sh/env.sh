@@ -56,6 +56,11 @@ fi
 #
 # Pyenv python-version management tool
 #
-PATH="$(path_add --before "${HOME}/.pyenv/bin" "$PATH")"
+case ":$PATH:" in
+*:${HOME}/.pyenv/bin:* ) : do nothing ;;
+* )
+	PATH="$(path_add --before "${HOME}/.pyenv/bin" "$PATH")"
+	;;
+esac
 
 # }}}

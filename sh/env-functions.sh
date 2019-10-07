@@ -55,6 +55,13 @@ _path_warning() {
 }
 
 path_add() {
+	# Usage:
+	#     PATH="$(path_add --after /new/path "$PATH")"
+	#     PATH="$(path_add --before /new/path "$PATH")"
+	#     PATH="$(path_add --after /bin /new/path "$PATH")"
+	#     PATH="$(path_add --before /bin /new/path "$PATH")"
+	#     PATH="$(path_add /new/path "$PATH")"   -- default is --after
+
 	local position="--after"
 	local target
 
@@ -132,11 +139,10 @@ Usage: PATHVAR=$(path_add [ { --before | --after } [DIR] ] "DIR" "$PATHVAR")
 
 path_delete() {
 	local target="$1"
-	local path=":$2:"
-	path="${path//:$target}"
-	path="${path#:}"
-	path="${path%:}"
-	printf "%s\n" "${path}"
+	local path="$(printf ":${2:-$PATH}:" \
+		| sed -e "s#:\($target\)\(:\1\)*:#:#g"  \
+			-e 's/^://' -e 's/:$//' )"
+	printf "${path}\n"
 	return 0
 }
 
