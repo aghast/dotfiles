@@ -1,6 +1,7 @@
 [submodule "editorconfig-vim"]
 	path = vim/pack/aghast/start/editorconfig-vim
 	url = https://github.com/editorconfig/editorconfig-vim.git
+
 [submodule "tpope/surround"]
 	path = vim/pack/tpope/start/surround
 	url = https://tpope.io/vim/surround.git
@@ -13,4 +14,23 @@
 	path = vim/pack/LucHermitte/start/local_vimrc
 	url = https://github.com/LucHermitte/local_vimrc
 
+[submodule "syntastic"]
+	path = vim/pack/aghast/start/syntastic
+	url = https://github.com/vim-syntastic/syntastic
+
+[submodule "thinca/vim-prettyprint"]
+	path = vim/pack/thinca/start/vim-prettyprint
+	url = https://github.com/thinca/vim-prettyprint
+
+[submodule "syntastic"]
+	path = vim/pack/aghast/start/syntastic
+	url = https://github.com/vim-syntastic/syntastic
+
+[submodule "todo.txt-vim"]
+	path = vim/pack/aghast/start/todo.txt-vim
+	url = https://github.com/freitass/todo.txt-vim
+
+[submodule "vim-buffergator"]
+	path = vim/pack/aghast/start/vim-buffergator
+	url = https://github.com/jeetsukumaran/vim-buffergator
 
