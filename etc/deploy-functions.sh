@@ -78,6 +78,7 @@ symlink() {
                 printf "   - ... removed previous symlink\n"
             else
                 ERROR "Could not remove existing symlink"
+            fi
         else
             ERROR "File '$link' blocks creation of symlink."
         fi

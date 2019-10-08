@@ -19,16 +19,12 @@ deploy_ctags() {
 		cp -ab "$ctags_file" "$HOME/ctags.cnf" \
 		|| ERROR "Failed to copy ~/ctags.cnf <- $ctags_file" 
 		;;
-	*) 
-		ERROR "Invalid link/copy type: '$1'" 
-		;;
 	esac
 }
 
 ## VIMRC & GVIMRC
 
 deploy_vimrc() {
-	# shellcheck disable=SC2039
 	local vimrc_file="$DOTFILES/vim/etc/_vimrc"
 	local gvimrc_file="$DOTFILES/vim/etc/_gvimrc"
 
@@ -45,9 +41,6 @@ deploy_vimrc() {
 		|| ERROR "Failed to copy ~/_vimrc <- $vimrc_file" 
 		cp -ab "$gvimrc_file" "$HOME/_gvimrc" \
 		|| ERROR "Failed to copy ~/_gvimrc <- $gvimrc_file" 
-		;;
-	*) 
-		ERROR "Invalid link/copy type: '$1'" 
 		;;
 	esac
 }

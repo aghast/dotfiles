@@ -1,0 +1,22 @@
+" $DOTFILES/vim/_gvimrc {{{
+"
+" Trampoline to be symlinked or copied into $HOME as .gvimrc or _gvimrc.
+"
+" If we have symbolic links, then ~/.gvimrc should be a symlink to this file,
+" $DOTFILES/vim/_gvimrc, and ~/.vim should be a symlink to $DOTFILES/vim.
+"
+" With no symlinks, this file should be copied to $HOME as either _gvimrc
+" (under Windows) or .gvimrc (under Unix). 
+"
+" This file assumes that .vimrc (or _vimrc) has done its job, and the
+" user-variables have their correct values to locate the dotfiles directory.
+" The only task remaining is to invoke the "real" gvimrc from the dotfiles
+" project.
+"
+" }}} 
+if !exists('g:aghast_dot_vim_dir')
+    echoerr "gvimrc: Variable g:aghast_dot_vim_dir not set by vimrc. Don't know how to find gvimrc.vim"
+    finish
+endif
+
+execute "source ".g:aghast_dot_vim_dir."/gvimrc.vim"

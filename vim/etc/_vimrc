@@ -1,0 +1,105 @@
+" $DOTFILES/vim/_vimrc {{{
+"
+" Trampoline to be symlinked or copied into $HOME as .vimrc or _vimrc.
+"
+" If we have symbolic links, then ~/.vimrc should be a symlink to this file,
+" $DOTFILES/vim/_vimrc, and ~/.vim should be a symlink to $DOTFILES/vim.
+"
+" With no symlinks, this file should be copied to $HOME as either _vimrc
+" (under Windows) or .vimrc (under Unix). 
+"
+" The job of this file is (1) to ensure that the right user-variables are
+" defined, providing a default value if needed. Then (2) to invoke the "real"
+" vimrc file from the dotfiles project.
+"
+" This file is processed during section "3." of the Vim startup process.  (See
+" ":help startup" for the documentation.) For Unix systems, where symbolic
+" links are available, the best approach is to create a symlink from
+" $HOME/.vimrc pointing to $DOTFILES/vim/_vimrc. The vim/etc/deploy.sh script
+" should do this. 
+"
+" For Windows, you can copy this file into $HOME, or set the $VIM directory to
+" point to $DOTFILES/vim. Either should work. (The vim/etc/deploy.sh script
+" will make the copy for you.)
+"
+" The $VIMINIT variable can override this (see "3.c.I") if necessary. For
+" example, if the $HOME location is readonly and cannot be modified (on Unix;
+" Windows users can just set $VIM).
+"
+" Once the end of this file is processed, the startup process enters step "4."
+" -- "load-plugins". (See ":help load-plugins".) The plugin load process is
+"  similar in effect to the command: :runtime! plugin/**/*.vim which obviously
+"  depends on setting the &runtimepath (as I do below).
+"
+" IMPORTANT: Vim loads 'plugins' before loading 'packages.' This means that
+" files under $DOTFILES/vim/plugin will be run before files under
+" $DOTFILES/vim/pack. For this reason, my "aghast-vimrc" directory is below
+" vim/plugin.
+"
+" }}} 
+" Provide a default value for $DOTFILES {{{
+
+if empty($DOTFILES)
+    let _DOTFILES = '~/.dotfiles'
+    echom "$DOTFILES is empty. Looking for value in "._DOTFILES
+    let dotfiles = fnamemodify(_DOTFILES, ':p')
+
+    if filereadable(dotfiles)
+        let lines = readfile(dotfiles)
+        for line in lines
+            let line = substitute(line, '^\s*\(.*\S\)?\s*$', '\\1', '')
+            if line ==# "" || line =~ '^#'
+                continue
+            endif
+
+            let $DOTFILES=line
+            echom "... "._DOTFILES." contained: '".line."'"
+            break
+        endfor
+
+        unlet line lines
+    endif
+    unlet dotfiles
+
+    if empty($DOTFILES)
+        echom "$DOTFILES is empty. Trying some defaults:"
+        dotfile_defaults = [ '~/.dotfiles', '~/_dotfiles', '~/dotfiles',
+            \ '~/Code/dotfiles', '~/Code/aghast/dotfiles', 
+            \ '~/Code/'.$USER.'/dotfiles' ]
+
+        for cand in dotfile_defaults
+            let dirc = fnamemodify(cand, ':p')
+            if ! isdirectory(dirc) || ! isdirectory(dirc.'/vim')
+                continue
+            endif
+
+            let $DOTFILES = dirc
+            echom "... found candidate in '".dirc."'"
+            break
+        endfor
+        unlet dotfile_defaults cand dirc
+    endif
+
+    if empty($DOTFILES)
+        echoerr "$DOTFILES is empty and no candidates found."
+        finish
+    endif
+endif
+" }}}
+" Replace '~/.vim' with '$DOTFILES/vim' in &runtimepath {{{
+
+let g:aghast_dot_vim_dir = $DOTFILES . '/vim'
+let g:aghast_dot_vim_after_dir = g:aghast_dot_vim_dir . '/after'
+
+" Remove possibly-bad values from rtp.
+set runtimepath-=~/.vim
+set runtimepath-=~/.vim/after
+
+" Install computed-good values
+let &runtimepath = g:aghast_dot_vim_dir 
+    \ . (empty(&runtimepath) ? "" : ",") . &runtimepath
+    \ . "," . g:aghast_dot_vim_after_dir
+
+" }}}
+
+execute "source ".g:aghast_dot_vim_dir."/vimrc.vim"
