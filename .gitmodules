@@ -34,3 +34,6 @@
 	path = vim/pack/aghast/start/vim-buffergator
 	url = https://github.com/jeetsukumaran/vim-buffergator
 
+[submodule "vim/pack/commentary/start/commentary"]
+	path = vim/pack/commentary/start/commentary
+	url = https://tpope.io/vim/commentary.git
